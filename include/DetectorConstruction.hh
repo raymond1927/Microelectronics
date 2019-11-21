@@ -69,6 +69,9 @@ private:
   G4Box*             fSolidWorld;
 
   G4Material*        fSiMaterial;
+  G4Material*        fSiNMaterial;
+  G4Material*        fAlGaAsMaterial;
+  G4Material*        fAirMaterial;
   G4Region*          fRegion;
 
   void DefineMaterials();
