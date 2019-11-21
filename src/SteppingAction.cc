@@ -93,7 +93,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
    analysisManager->FillNtupleDColumn(3, y);
    analysisManager->FillNtupleDColumn(4, z);
    analysisManager->FillNtupleDColumn(5, step->GetTotalEnergyDeposit()/eV);
-   analysisManager->FillNtupleDColumn(6, std::sqrt((x-xp)*(x-xp)+(y-yp)*(y-yp)+(z-zp)*(z-zp))/nm);
+   analysisManager->FillNtupleDColumn(6, std::sqrt((x-xp)*(x-xp)+(y-yp)*(y-yp)+(z-zp)*(z-zp)));
    analysisManager->FillNtupleDColumn(7, (step->GetPreStepPoint()->GetKineticEnergy() - step->GetPostStepPoint()->GetKineticEnergy())/eV );
    analysisManager->AddNtupleRow();      
  }

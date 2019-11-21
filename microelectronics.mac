@@ -3,8 +3,8 @@
 
 #/gun/particle ion
 #/gun/ion 20 48 15
-/gun/particle proton
-/gun/energy 5 MeV
+/gun/particle e-
+/gun/energy 18 keV
 
 #/run/numberOfThreads 2 #if MT is activated
 

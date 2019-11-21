@@ -41,7 +41,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
   // default gun parameters
   fParticleGun->SetParticleEnergy(18.*keV);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
-  fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,-0.4*um));
+  fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,-2.01*um));
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....

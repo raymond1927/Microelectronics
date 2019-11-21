@@ -30,6 +30,8 @@
 #include "G4SystemOfUnits.hh"
 #include "G4Region.hh"
 #include "G4ProductionCuts.hh"
+#include "G4Material.hh"
+#include "G4UnitsTable.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
@@ -58,11 +60,39 @@ void DetectorConstruction::DefineMaterials()
 
   // Silicon is defined from NIST material database
   G4NistManager * man = G4NistManager::Instance();
-  G4Material * Si = man->FindOrBuildMaterial("G4_Si");
+  G4Material * GaAs = man->FindOrBuildMaterial("G4_GALLIUM_ARSENIDE");
 
   // Default materials in setup.
-  fSiMaterial = Si;
-  
+  fSiMaterial = GaAs;
+
+  G4double z,a;
+
+  G4Element* Si = new G4Element("Silicon", "Si", z=14., a=28.0855*g/mole);
+  G4Element* N = new G4Element("Nitrogen", "N", z=7., a=14.01*g/mole);
+
+  G4double density;
+  G4int ncomponents, natoms;
+  G4double fractionmass;
+
+  G4Material* SiN = new G4Material("SiN", density=3.17*g/cm3,ncomponents=2);
+  SiN->AddElement(Si, natoms=1);
+  SiN->AddElement(N,natoms=1);
+
+  fSiNMaterial = SiN;
+//  G4Element* Al = man->FindElement(13);
+//  G4Element* Ga = man->FindElement(31);
+//  G4Element* As = man->FindElement(33);
+  G4Element* Al = new G4Element("Aluminium", "Al", z=13., a=26.9815*g/mole);
+  G4Element* Ga = new G4Element("Gallium", "Ga", z=31., a=69.723*g/mole);
+  G4Element* As = new G4Element("Arsenic", "As", z=33., a=74.922*g/mole);
+  G4Material* AlGaAs = new G4Material("AlGaAs", density=2.329*g/cm3, ncomponents=3);
+  AlGaAs->AddElement(Al, fractionmass=26.6*perCent);
+  AlGaAs->AddElement(Ga, fractionmass=36.7*perCent);
+  AlGaAs->AddElement(As, fractionmass=36.7*perCent);
+
+  fAlGaAsMaterial = AlGaAs;
+
+  fAirMaterial = man->FindOrBuildMaterial("G4_AIR");
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
@@ -73,16 +103,16 @@ G4VPhysicalVolume* DetectorConstruction::ConstructDetector()
 
   // WORLD VOLUME
   
-  fWorldSizeX  = 1*um;
-  fWorldSizeY  = 1*um;
-  fWorldSizeZ  = 1*um;
+  fWorldSizeX  = 40*um;
+  fWorldSizeY  = 40*um;
+  fWorldSizeZ  = 4*um;
 
   fSolidWorld = new G4Box("World",				     //its name
-			   fWorldSizeX/2,fWorldSizeY/2,fWorldSizeZ/2);  //its size
+			   fWorldSizeX*0.5,fWorldSizeY*0.5,fWorldSizeZ*0.5);  //its size
   
 
   fLogicWorld = new G4LogicalVolume(fSolidWorld,	//its solid
-				   fSiMaterial,		//its material
+				   fAirMaterial,		//its material
 				   "World");		//its name
   
   fPhysiWorld = new G4PVPlacement(0,			//no rotation
@@ -93,23 +123,108 @@ G4VPhysicalVolume* DetectorConstruction::ConstructDetector()
                                  false,			//no boolean operation
                                  0);			//copy number
 
-  G4double TargetSizeZ =  0.2*um;
+  G4double TargetSizeZ1 =  0.07*um;
+  G4double TargetSizeZ2 =  0.043*um;
+  G4double TargetSizeZ3 =  0.2*um;
+  G4double TargetSizeZ4 =  0.2*um;
+  G4double TargetSizeZ5 =  3*um;
+  G4double TargetSizeZ6 =  0.3*um;
 
-  G4Box* targetSolid = new G4Box("Target",				     //its name
-				 fWorldSizeX/2,fWorldSizeY/2,TargetSizeZ/2);   //its size
+  G4Box* targetSolid1 = new G4Box("Target1",				     //its name
+				 fWorldSizeX/2,fWorldSizeY/2,TargetSizeZ1/2);   //its size
   
 
-  G4LogicalVolume* logicTarget = new G4LogicalVolume(targetSolid,       //its solid
-						     fSiMaterial,	//its material
-						     "Target");		//its name
+  G4LogicalVolume* logicTarget1 = new G4LogicalVolume(targetSolid1,       //its solid
+						     fSiNMaterial,	//its material
+						     "Target1");		//its name
   
   new G4PVPlacement(0,			                               //no rotation
-		    G4ThreeVector(),	                               //at (0,0,0)
-		    "Target",		//its name
-		    logicTarget,	//its logical volume
+		    G4ThreeVector(0,0,-2*um+0.5*TargetSizeZ1),
+		    "Target1",		//its name
+		    logicTarget1,	//its logical volume
 		    fPhysiWorld,		//its mother  volume
 		    false,		//no boolean operation
 		    0);			//copy number
+
+    G4Box* targetSolid2 = new G4Box("Target2",				     //its name
+                                    fWorldSizeX/2,fWorldSizeY/2,TargetSizeZ2/2);   //its size
+
+
+    G4LogicalVolume* logicTarget2 = new G4LogicalVolume(targetSolid2,       //its solid
+                                                        fAlGaAsMaterial,	//its material
+                                                        "Target2");		//its name
+
+    new G4PVPlacement(0,			                               //no rotation
+                      G4ThreeVector(0,0,-2*um+0.5*TargetSizeZ2+TargetSizeZ1),
+                      "Target2",		//its name
+                      logicTarget2,	//its logical volume
+                      fPhysiWorld,		//its mother  volume
+                      false,		//no boolean operation
+                      0);			//copy number
+
+    G4Box* targetSolid3 = new G4Box("Target3",				     //its name
+                                   fWorldSizeX/2,fWorldSizeY/2,TargetSizeZ3/2);   //its size
+
+
+    G4LogicalVolume* logicTarget3 = new G4LogicalVolume(targetSolid3,       //its solid
+                                                        fSiMaterial,	//its material
+                                                        "Target3");		//its name
+
+    new G4PVPlacement(0,			                               //no rotation
+                      G4ThreeVector(0,0,-2*um+0.5*TargetSizeZ3+TargetSizeZ2+TargetSizeZ1),
+                      "Target3",		//its name
+                      logicTarget3,	//its logical volume
+                      fPhysiWorld,		//its mother  volume
+                      false,		//no boolean operation
+                      0);			//copy number
+
+    G4Box* targetSolid4 = new G4Box("Target4",				     //its name
+                                    fWorldSizeX/2,fWorldSizeY/2,TargetSizeZ4/2);   //its size
+
+
+    G4LogicalVolume* logicTarget4 = new G4LogicalVolume(targetSolid4,       //its solid
+                                                        fSiMaterial,	//its material
+                                                        "Target4");		//its name
+
+    new G4PVPlacement(0,			                               //no rotation
+                      G4ThreeVector(0,0,-2*um+0.5*TargetSizeZ4+TargetSizeZ3+TargetSizeZ2+TargetSizeZ1),
+                      "Target4",		//its name
+                      logicTarget4,	//its logical volume
+                      fPhysiWorld,		//its mother  volume
+                      false,		//no boolean operation
+                      0);			//copy number
+
+    G4Box* targetSolid5 = new G4Box("Target5",				     //its name
+                                    fWorldSizeX/2,fWorldSizeY/2,TargetSizeZ5/2);   //its size
+
+
+    G4LogicalVolume* logicTarget5 = new G4LogicalVolume(targetSolid5,       //its solid
+                                                        fSiMaterial,	//its material
+                                                        "Target5");		//its name
+
+    new G4PVPlacement(0,			                               //no rotation
+                      G4ThreeVector(0,0,-2*um+0.5*TargetSizeZ5+TargetSizeZ4+TargetSizeZ3+TargetSizeZ2+TargetSizeZ1),
+                      "Target5",		//its name
+                      logicTarget5,	//its logical volume
+                      fPhysiWorld,		//its mother  volume
+                      false,		//no boolean operation
+                      0);			//copy number
+
+    G4Box* targetSolid6 = new G4Box("Target6",				     //its name
+                                    fWorldSizeX/2,fWorldSizeY/2,TargetSizeZ6/2);   //its size
+
+
+    G4LogicalVolume* logicTarget6 = new G4LogicalVolume(targetSolid6,       //its solid
+                                                        fSiMaterial,	//its material
+                                                        "Target6");		//its name
+
+    new G4PVPlacement(0,			                               //no rotation
+                      G4ThreeVector(0,0,-2*um+0.5*TargetSizeZ6+TargetSizeZ5+TargetSizeZ4+TargetSizeZ3+TargetSizeZ2+TargetSizeZ1),
+                      "Target6",		//its name
+                      logicTarget6,	//its logical volume
+                      fPhysiWorld,		//its mother  volume
+                      false,		//no boolean operation
+                      0);			//copy number
 
   // Visualization attributes
   G4VisAttributes* worldVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0)); //White
@@ -118,11 +233,15 @@ G4VPhysicalVolume* DetectorConstruction::ConstructDetector()
 
   G4VisAttributes* worldVisAtt1 = new G4VisAttributes(G4Colour(1.0,0.0,0.0)); 
   worldVisAtt1->SetVisibility(true);
-  logicTarget->SetVisAttributes(worldVisAtt1);
+  logicTarget1->SetVisAttributes(worldVisAtt1);
+
+    G4VisAttributes* worldVisAtt2 = new G4VisAttributes(G4Colour(1.0,0.0,0.0));
+    worldVisAtt2->SetVisibility(true);
+    logicTarget2->SetVisAttributes(worldVisAtt2);
 
   // Create Target G4Region and add logical volume
   
-  fRegion = new G4Region("Target");
+  fRegion = new G4Region("World");
   
   G4ProductionCuts* cuts = new G4ProductionCuts();
   
@@ -133,7 +252,10 @@ G4VPhysicalVolume* DetectorConstruction::ConstructDetector()
   cuts->SetProductionCut(defCut,"proton");
   
   fRegion->SetProductionCuts(cuts);
-  fRegion->AddRootLogicalVolume(logicTarget); 
-
+  fRegion->AddRootLogicalVolume(logicTarget1);
+  fRegion->AddRootLogicalVolume(logicTarget2);
+  fRegion->AddRootLogicalVolume(logicTarget3);
+  fRegion->AddRootLogicalVolume(logicTarget4);
+  fRegion->AddRootLogicalVolume(logicTarget5);
   return fPhysiWorld;
 }
