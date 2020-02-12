@@ -69,6 +69,9 @@ private:
   G4Box*             fSolidWorld;
 
   G4Material*        fSiMaterial;
+  G4Material*        perovskiteMaterial;
+  G4Material*        spiroMaterial;
+  G4Material*        goldMaterial;
   G4Material*        fSiNMaterial;
   G4Material*        fAlGaAsMaterial;
   G4Material*        fAirMaterial;

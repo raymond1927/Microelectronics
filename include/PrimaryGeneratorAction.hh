@@ -36,17 +36,23 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
-{
+class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
 public:
 
-  PrimaryGeneratorAction();    
-  ~PrimaryGeneratorAction();
-  
-  void GeneratePrimaries(G4Event*);
+    PrimaryGeneratorAction();
+
+    ~PrimaryGeneratorAction();
+
+    void GeneratePrimaries(G4Event *);
 
 private:
 
-  G4ParticleGun*           fParticleGun;
+    G4ParticleGun *fParticleGun;
+    int particleCount;
+    std::vector<G4double> sr90Energies;
+    std::vector<G4double> sr90Probability;
+    std::vector<G4double> y90Energies;
+    std::vector<G4double> y90Probability;
 };
+
 #endif
