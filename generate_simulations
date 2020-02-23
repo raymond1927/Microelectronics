@@ -57,7 +57,7 @@ do
 	# Move simulation results to folder and append to each other, remove comments of second file
 	cp ./microelectronics_nt_microelectronics_t0.csv "./simulation_results/${prefix}${count}.csv"
 	cat ./microelectronics_nt_microelectronics_t1.csv |\
-	       	tail -n +13 >> "./simulation_results/${prefix}${count}.csv"
+	       	tail -n +15 >> "./simulation_results/${prefix}${count}.csv"
 
 	# Increment count
 	count=$(($count + $inc))
