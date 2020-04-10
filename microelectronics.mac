@@ -6,7 +6,7 @@
 /gun/particle e-
 /gun/energy 18 keV
 
-#/run/numberOfThreads 2 #if MT is activated
+/run/numberOfThreads 1 #if MT is activated
 
 /run/initialize
-/run/beamOn 2
+/run/beamOn 1

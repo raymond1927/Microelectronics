@@ -237,6 +237,7 @@ void RunAction::CreateHistogram()
 	analysisManager->CreateNtupleDColumn("kineticEnergyDifference");
 	analysisManager->CreateNtupleIColumn("trackID");
 	analysisManager->CreateNtupleIColumn("parentID");
+	analysisManager->CreateNtupleDColumn("kineticEnergy");
 	analysisManager->FinishNtuple();
 }
 

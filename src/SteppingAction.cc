@@ -99,6 +99,7 @@ void SteppingAction::UserSteppingAction(const G4Step *step) {
                                                step->GetPostStepPoint()->GetKineticEnergy()) / eV);
         analysisManager->FillNtupleIColumn(8, step->GetTrack()->GetTrackID());
         analysisManager->FillNtupleIColumn(9, step->GetTrack()->GetParentID());
+        analysisManager->FillNtupleDColumn(10, step->GetPreStepPoint()->GetKineticEnergy());
 
         analysisManager->AddNtupleRow();
     }
