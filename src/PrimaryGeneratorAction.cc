@@ -46,32 +46,23 @@ PrimaryGeneratorAction::PrimaryGeneratorAction() {
     G4double sum = 0;
     G4int count = 0;
 
-    for (auto it = sr90Probability.begin(); it != sr90Probability.end(); ++it) {
+    for (auto it = ni63Probability.begin(); it != ni63Probability.end(); ++it) {
         sum += it.operator*();
         ++count;
     }
 
     G4int total_length = 10000;
-    sr90Dist.reserve(total_length);
-    y90Dist.reserve(total_length);
+    ni63Dist.reserve(total_length);
 
-    auto sr90it = sr90Energies.begin();
-    for (auto it = sr90Probability.begin(); it != sr90Probability.end(); ++it) {
+    auto ni63it = ni63Energies.begin();
+    for (auto it = ni63Probability.begin(); it != ni63Probability.end(); ++it) {
         G4int amount = std::floor(*it / sum * total_length);
 
-        std::fill_n(std::back_inserter(sr90Dist), amount, sr90it.operator*());
+        std::fill_n(std::back_inserter(ni63Dist), amount, ni63it.operator*());
 
-        ++sr90it;
+        ++ni63it;
     }
 
-    auto y90it = y90Energies.begin();
-    for (auto it = y90Probability.begin(); it != y90Probability.end(); ++it) {
-        G4int amount = std::floor(*it / sum * total_length);
-
-        std::fill_n(std::back_inserter(y90Dist), amount, y90it.operator*());
-
-        ++y90it;
-    }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
@@ -84,14 +75,11 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction() {
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
 
-    G4int sr_index = std::floor(G4UniformRand() * (sr90Dist.size() - 1));
-    G4double sr_energy = sr90Dist.at(sr_index);
+    G4int index = std::floor(G4UniformRand() * (ni63Dist.size() - 1));
+    G4double energy = ni63Dist.at(index);
 
-    G4int y_index = std::floor(G4UniformRand() * (y90Dist.size() - 1));
-    G4double y_energy = y90Dist.at(y_index);
 
-    G4double total_energy = sr_energy + y_energy;
-    fParticleGun->SetParticleEnergy(total_energy * MeV);
+    fParticleGun->SetParticleEnergy(energy * MeV);
     fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
