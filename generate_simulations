@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Have help command
+if [[ $# -eq 1 && $1 =~ '--help' ]]; then
+	echo "generate_simulations [begin] [end] [increment] [file_prefix]"
+	echo "[begin]: energy level to begin at in eV"
+	echo "[end]: energy level to end at in eV"
+	echo "[increment]: energy increment per simulation in eV"
+	echo "[file_prefix]: prefix for simulation results"
+	exit 0
+fi
+
+# Create directory if there isn't one
+if ! [[ -d "simulation_results" ]]; then
+	mkdir simulation_results
+fi
+
+# Check that the correct number of arguements entered
+if [ $# -ne 4 ]; then
+	echo "Error: Incorrect number of arguements"
+	echo "generate_simulations --help"
+	exit 1
+fi
+
+# Check that digits are entered
+re='^[0-9]+$'
+if ! [[ $1 =~ $re && $2 =~ $re && $3 =~ $re ]]; then
+	echo "Error: Not a number" >&2;
+	exit 1
+fi
+
+# Check that first arguement is less than second arguement
+if [ $1 -gt $2 ]; then
+	echo "Error: $1 should be less than $2"
+fi
+
+# Assign arguements to variables
+count=$1
+end=$2
+inc=$3
+prefix=$4
+
+# Loop through all required energy
+while [ $count -lt $end ]
+do
+	# Set up input file
+	echo "/tracking/verbose 0" > batch_input.in
+	echo "/run/verbose 2" >> batch_input.in
+	echo "/gun/particle e-" >> batch_input.in
+	echo "/gun/energy $count eV" >> batch_input.in
+	echo "/run/initialize" >> batch_input.in
+	echo "/run/beamOn 10000" >> batch_input.in
+	
+	# Run simulation with input file
+	./cmake-build-debug/microelectronics batch_input.in
+
+	# Move simulation results to folder and append to each other, remove comments of second file
+	cp ./microelectronics_nt_microelectronics_t0.csv "./simulation_results/${prefix}${count}.csv"
+	cat ./microelectronics_nt_microelectronics_t1.csv |\
+	       	tail -n +15 >> "./simulation_results/${prefix}${count}.csv"
+
+	# Increment count
+	count=$(($count + $inc))
+done
