@@ -35,46 +35,42 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction)
-: G4VUserActionInitialization(),
-  fDetectorConstruction(detConstruction)
-{}
+ActionInitialization::ActionInitialization(DetectorConstruction *detConstruction)
+        : G4VUserActionInitialization(),
+          fDetectorConstruction(detConstruction) {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-ActionInitialization::~ActionInitialization()
-{}
+ActionInitialization::~ActionInitialization() {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void ActionInitialization::BuildForMaster() const
-{
-	// In MT mode, to be clearer, the RunAction class for the master thread might be
-	// different than the one used for the workers.
-	// This RunAction will be called before and after starting the
-	// workers.
-	// For more details, please refer to :
-	// https://twiki.cern.ch/twiki/bin/view/Geant4/Geant4MTForApplicationDevelopers
-	//
-	// RunAction* runAction= new RunAction(fDetectorConstruction);
-	// SetUserAction(runAction);
+void ActionInitialization::BuildForMaster() const {
+    // In MT mode, to be clearer, the RunAction class for the master thread might be
+    // different than the one used for the workers.
+    // This RunAction will be called before and after starting the
+    // workers.
+    // For more details, please refer to :
+    // https://twiki.cern.ch/twiki/bin/view/Geant4/Geant4MTForApplicationDevelopers
+    //
+    // RunAction* runAction= new RunAction(fDetectorConstruction);
+    // SetUserAction(runAction);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void ActionInitialization::Build() const
-{
-	// G4cout << "Build for = "<< G4RunManager::GetRunManager()->GetRunManagerType() << G4endl;
+void ActionInitialization::Build() const {
+    // G4cout << "Build for = "<< G4RunManager::GetRunManager()->GetRunManagerType() << G4endl;
 
-	SetUserAction(new PrimaryGeneratorAction);
+    SetUserAction(new PrimaryGeneratorAction);
 
-	TrackingAction* trackingAction = new TrackingAction(fDetectorConstruction);
-	SetUserAction(trackingAction);
+    TrackingAction *trackingAction = new TrackingAction(fDetectorConstruction);
+    SetUserAction(trackingAction);
 
-	RunAction* runAction= new RunAction();
-	SetUserAction(runAction);
+    RunAction *runAction = new RunAction();
+    SetUserAction(runAction);
 
-	SetUserAction(new SteppingAction());
-}  
+    SetUserAction(new SteppingAction());
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

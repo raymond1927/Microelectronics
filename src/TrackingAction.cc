@@ -36,42 +36,36 @@
 
 using namespace std;
 
-TrackingAction::TrackingAction(DetectorConstruction* detector)
-{
+TrackingAction::TrackingAction(DetectorConstruction *detector) {
     fDetector = detector;
     fTargetRegion = 0;
 }
 
-TrackingAction::~TrackingAction()
-{
+TrackingAction::~TrackingAction() {
     fDetector = 0;
     fTargetRegion = 0;
 }
 
-void TrackingAction::PreUserTrackingAction(const G4Track* track)
-{
-    const G4ParticleDefinition* particleDefinition = track->GetParticleDefinition();
+void TrackingAction::PreUserTrackingAction(const G4Track *track) {
+    const G4ParticleDefinition *particleDefinition = track->GetParticleDefinition();
 
-    if(particleDefinition == G4Electron::Definition() || particleDefinition == G4Gamma::Definition())
-    {
-        if(fTargetRegion == 0) // target region is initialized after detector construction instantiation
+    if (particleDefinition == G4Electron::Definition() || particleDefinition == G4Gamma::Definition()) {
+        if (fTargetRegion == 0) // target region is initialized after detector construction instantiation
         {
             fTargetRegion = fDetector->GetTargetRegion();
         }
 
-        const G4ThreeVector& position = track->GetPosition();
+        const G4ThreeVector &position = track->GetPosition();
 
-        int N =  fTargetRegion->GetNumberOfRootVolumes();
-        std::vector<G4LogicalVolume*>::iterator it_logicalVolumeInRegion =
+        int N = fTargetRegion->GetNumberOfRootVolumes();
+        std::vector<G4LogicalVolume *>::iterator it_logicalVolumeInRegion =
                 fTargetRegion->GetRootLogicalVolumeIterator();
 
         bool inside_target = false;
 
-        for(int i = 0; i < N ; i++, it_logicalVolumeInRegion++)
-        {
-            EInside test_status = (*it_logicalVolumeInRegion)->GetSolid()->Inside(position) ;
-            if(test_status == kInside)
-            {
+        for (int i = 0; i < N; i++, it_logicalVolumeInRegion++) {
+            EInside test_status = (*it_logicalVolumeInRegion)->GetSolid()->Inside(position);
+            if (test_status == kInside) {
                 inside_target = true;
                 break;
             }
@@ -82,12 +76,9 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
             */
         }
 
-        if(inside_target == true)
-        {
+        if (inside_target == true) {
             fNParticleInTarget[particleDefinition]++;
-        }
-        else
-        {
+        } else {
             fNParticleInWorld[particleDefinition]++;
         }
     }

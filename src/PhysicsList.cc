@@ -33,63 +33,56 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-PhysicsList::PhysicsList():  G4VUserPhysicsList()
-{
-  defaultCutValue = 1*micrometer;
-  cutForGamma     = defaultCutValue;
-  cutForElectron  = defaultCutValue;
-  cutForPositron  = defaultCutValue;
-  cutForProton    = defaultCutValue;
-  
-  SetVerboseLevel(1);
+PhysicsList::PhysicsList() : G4VUserPhysicsList() {
+    defaultCutValue = 1 * micrometer;
+    cutForGamma = defaultCutValue;
+    cutForElectron = defaultCutValue;
+    cutForPositron = defaultCutValue;
+    cutForProton = defaultCutValue;
+
+    SetVerboseLevel(1);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-PhysicsList::~PhysicsList()
-{}
+PhysicsList::~PhysicsList() {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-void PhysicsList::ConstructParticle()
-{
-  ConstructBosons();
-  ConstructLeptons();
-  ConstructBarions();
+void PhysicsList::ConstructParticle() {
+    ConstructBosons();
+    ConstructLeptons();
+    ConstructBarions();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-void PhysicsList::ConstructBosons()
-{ 
-  // gamma
-  G4Gamma::GammaDefinition();
+void PhysicsList::ConstructBosons() {
+    // gamma
+    G4Gamma::GammaDefinition();
 }
- //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-void PhysicsList::ConstructLeptons()
-{
-  // leptons
-  G4Electron::ElectronDefinition();
-  G4Positron::PositronDefinition();
+void PhysicsList::ConstructLeptons() {
+    // leptons
+    G4Electron::ElectronDefinition();
+    G4Positron::PositronDefinition();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-void PhysicsList::ConstructBarions()
-{
-  //  baryons
-  G4Proton::ProtonDefinition();
-  G4GenericIon::GenericIonDefinition();
+void PhysicsList::ConstructBarions() {
+    //  baryons
+    G4Proton::ProtonDefinition();
+    G4GenericIon::GenericIonDefinition();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-void PhysicsList::ConstructProcess()
-{
-  AddTransportation();
-  ConstructEM();
-  ConstructGeneral();
+void PhysicsList::ConstructProcess() {
+    AddTransportation();
+    ConstructEM();
+    ConstructGeneral();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
@@ -126,194 +119,189 @@ void PhysicsList::ConstructProcess()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-void PhysicsList::ConstructEM()
-{
+void PhysicsList::ConstructEM() {
 
-  auto particleIterator=GetParticleIterator();
-  particleIterator->reset();
-  
-  while( (*particleIterator)() )
-  {
+    auto particleIterator = GetParticleIterator();
+    particleIterator->reset();
 
-    G4ParticleDefinition* particle = particleIterator->value();
-    G4ProcessManager* pmanager = particle->GetProcessManager();
-    G4String particleName = particle->GetParticleName();
+    while ((*particleIterator)()) {
 
-    // *********************************
-    // 1) Processes for the World region
-    // *********************************
+        G4ParticleDefinition *particle = particleIterator->value();
+        G4ProcessManager *pmanager = particle->GetProcessManager();
+        G4String particleName = particle->GetParticleName();
 
-    if (particleName == "e-") {
+        // *********************************
+        // 1) Processes for the World region
+        // *********************************
 
-      // STANDARD msc is active in the world
-      G4eMultipleScattering* msc = new G4eMultipleScattering();
-      msc->AddEmModel(1, new G4UrbanMscModel());
-      pmanager->AddProcess(msc, -1, 1, -1);
+        if (particleName == "e-") {
 
-      // STANDARD ionisation is active in the world
-      G4eIonisation* eion = new G4eIonisation();
-      pmanager->AddProcess(eion, -1, 2, 2);
+            // STANDARD msc is active in the world
+            G4eMultipleScattering *msc = new G4eMultipleScattering();
+            msc->AddEmModel(1, new G4UrbanMscModel());
+            pmanager->AddProcess(msc, -1, 1, -1);
 
-      // MicroElec elastic is not active in the world 
-      G4MicroElecElastic* theMicroElecElasticProcess = new G4MicroElecElastic("e-_G4MicroElecElastic");
-      theMicroElecElasticProcess->SetEmModel(new G4DummyModel(),1);
-      pmanager->AddDiscreteProcess(theMicroElecElasticProcess);
+            // STANDARD ionisation is active in the world
+            G4eIonisation *eion = new G4eIonisation();
+            pmanager->AddProcess(eion, -1, 2, 2);
 
-      // MicroElec ionisation is not active in the world 
-      G4MicroElecInelastic* microelecioni = new G4MicroElecInelastic("e-_G4MicroElecInelastic");
-      microelecioni->SetEmModel(new G4DummyModel(),1); 
-      pmanager->AddDiscreteProcess(microelecioni);
+            // MicroElec elastic is not active in the world
+            G4MicroElecElastic *theMicroElecElasticProcess = new G4MicroElecElastic("e-_G4MicroElecElastic");
+            theMicroElecElasticProcess->SetEmModel(new G4DummyModel(), 1);
+            pmanager->AddDiscreteProcess(theMicroElecElasticProcess);
 
-      // THE FOLLOWING PROCESS WILL KILL ALL ELECTRONS BELOW A SELECTED ENERY THRESHOLD
-      // Capture of low-energy e-
-      G4ElectronCapture* ecap = new G4ElectronCapture("Target", 16.7*eV);
-      pmanager->AddDiscreteProcess(ecap);
-     	    
-    } else if ( particleName == "proton" ) {
+            // MicroElec ionisation is not active in the world
+            G4MicroElecInelastic *microelecioni = new G4MicroElecInelastic("e-_G4MicroElecInelastic");
+            microelecioni->SetEmModel(new G4DummyModel(), 1);
+            pmanager->AddDiscreteProcess(microelecioni);
 
-      // STANDARD msc is active in the world 
-      G4hMultipleScattering* msc = new G4hMultipleScattering();
-      msc->AddEmModel(1, new G4UrbanMscModel());
-      pmanager->AddProcess(msc, -1, 1, -1);
+            // THE FOLLOWING PROCESS WILL KILL ALL ELECTRONS BELOW A SELECTED ENERY THRESHOLD
+            // Capture of low-energy e-
+            G4ElectronCapture *ecap = new G4ElectronCapture("Target", 16.7 * eV);
+            pmanager->AddDiscreteProcess(ecap);
 
-      // STANDARD ionisation is active in the world 
-      G4hIonisation* hion = new G4hIonisation();
-      pmanager->AddProcess(hion, -1, 2, 2);
+        } else if (particleName == "proton") {
 
-      // MicroElec ionisation is not active in the world 
-      G4MicroElecInelastic* microelecioni = new G4MicroElecInelastic("p_G4MicroElecInelastic");
-      microelecioni->SetEmModel(new G4DummyModel(),1); 
-      microelecioni->SetEmModel(new G4DummyModel(),2); 
-      pmanager->AddDiscreteProcess(microelecioni);
+            // STANDARD msc is active in the world
+            G4hMultipleScattering *msc = new G4hMultipleScattering();
+            msc->AddEmModel(1, new G4UrbanMscModel());
+            pmanager->AddProcess(msc, -1, 1, -1);
 
-    } else if (particleName == "GenericIon") { 
+            // STANDARD ionisation is active in the world
+            G4hIonisation *hion = new G4hIonisation();
+            pmanager->AddProcess(hion, -1, 2, 2);
 
-      // STANDARD msc is active in the world 
-      G4hMultipleScattering* msc = new G4hMultipleScattering();
-      msc->AddEmModel(1, new G4UrbanMscModel());
-      pmanager->AddProcess(new G4hMultipleScattering, -1, 1, -1);
+            // MicroElec ionisation is not active in the world
+            G4MicroElecInelastic *microelecioni = new G4MicroElecInelastic("p_G4MicroElecInelastic");
+            microelecioni->SetEmModel(new G4DummyModel(), 1);
+            microelecioni->SetEmModel(new G4DummyModel(), 2);
+            pmanager->AddDiscreteProcess(microelecioni);
 
-      // STANDARD ionisation is active in the world 
-      G4ionIonisation* hion = new G4ionIonisation();
-      pmanager->AddProcess(hion, -1, 2, 2);
+        } else if (particleName == "GenericIon") {
 
-      // MicroElec ionisation is not active in the world 
-      G4MicroElecInelastic* microelecioni = new G4MicroElecInelastic("ion_G4MicroElecInelastic");
-      microelecioni->SetEmModel(new G4DummyModel(),1); 
-      microelecioni->SetEmModel(new G4DummyModel(),2);
-      pmanager->AddDiscreteProcess(microelecioni);
-    } 
-  }
+            // STANDARD msc is active in the world
+            G4hMultipleScattering *msc = new G4hMultipleScattering();
+            msc->AddEmModel(1, new G4UrbanMscModel());
+            pmanager->AddProcess(new G4hMultipleScattering, -1, 1, -1);
 
-  // **************************************
-  // 2) Define processes for Target region 
-  // **************************************
+            // STANDARD ionisation is active in the world
+            G4ionIonisation *hion = new G4ionIonisation();
+            pmanager->AddProcess(hion, -1, 2, 2);
 
-  // STANDARD EM processes should be inactivated when corresponding MicroElec processes are used
-  // - STANDARD EM e- processes are inactivated below 100 MeV
-  // - STANDARD EM proton & ion processes are inactivated below standEnergyLimit
-  //
-  G4EmConfigurator* em_config = G4LossTableManager::Instance()->EmConfigurator();
+            // MicroElec ionisation is not active in the world
+            G4MicroElecInelastic *microelecioni = new G4MicroElecInelastic("ion_G4MicroElecInelastic");
+            microelecioni->SetEmModel(new G4DummyModel(), 1);
+            microelecioni->SetEmModel(new G4DummyModel(), 2);
+            pmanager->AddDiscreteProcess(microelecioni);
+        }
+    }
 
-  G4VEmModel* mod;
-  // *** e-
+    // **************************************
+    // 2) Define processes for Target region
+    // **************************************
 
-  // ---> STANDARD EM processes are inactivated below 100 MeV
-  
-  G4UrbanMscModel* msc =  new G4UrbanMscModel();
-  msc->SetActivationLowEnergyLimit(100*MeV);
-  em_config->SetExtraEmModel("e-","msc",msc,"Target");
-  
-  mod = new G4MollerBhabhaModel();
-  mod->SetActivationLowEnergyLimit(100*MeV);
-  em_config->SetExtraEmModel("e-","eIoni",mod,"Target",0.0,10*TeV, new G4UniversalFluctuation());
+    // STANDARD EM processes should be inactivated when corresponding MicroElec processes are used
+    // - STANDARD EM e- processes are inactivated below 100 MeV
+    // - STANDARD EM proton & ion processes are inactivated below standEnergyLimit
+    //
+    G4EmConfigurator *em_config = G4LossTableManager::Instance()->EmConfigurator();
 
-  // ---> MicroElec processes activated
+    G4VEmModel *mod;
+    // *** e-
 
-  mod = new G4MicroElecElasticModel();
-  em_config->SetExtraEmModel("e-","e-_G4MicroElecElastic",mod,"Target",0.0,100*MeV);
-  
-  mod = new G4MicroElecInelasticModel();
-  em_config->SetExtraEmModel("e-","e-_G4MicroElecInelastic",mod,"Target",16.7*eV,100*MeV);
+    // ---> STANDARD EM processes are inactivated below 100 MeV
 
-  // *** proton
-  
-  // ---> STANDARD EM processes inactivated below standEnergyLimit
+    G4UrbanMscModel *msc = new G4UrbanMscModel();
+    msc->SetActivationLowEnergyLimit(100 * MeV);
+    em_config->SetExtraEmModel("e-", "msc", msc, "Target");
 
-  // STANDARD msc is still active
-  // Inactivate following STANDARD processes 
-    
-  mod = new G4BraggModel();
-  mod->SetActivationHighEnergyLimit(50*keV);
-  em_config->SetExtraEmModel("proton","hIoni",mod,"Target",0.0,2*MeV, new G4IonFluctuations());
-    
-  mod = new G4BetheBlochModel();
-  mod->SetActivationLowEnergyLimit(10*GeV);
-  em_config->SetExtraEmModel("proton","hIoni",mod,"Target",2*MeV,10*TeV, new G4IonFluctuations());
-			     
-  // ---> MicroElec processes activated  
-  mod = new G4MicroElecInelasticModel(); 
-  mod->SetActivationLowEnergyLimit(50*keV);
-  em_config->SetExtraEmModel("proton","p_G4MicroElecInelastic",mod,"Target",0.0,10*GeV);
-  em_config->SetExtraEmModel("proton","p_G4MicroElecInelastic",new G4DummyModel,
-			     "Target",10*GeV,10*TeV);
+    mod = new G4MollerBhabhaModel();
+    mod->SetActivationLowEnergyLimit(100 * MeV);
+    em_config->SetExtraEmModel("e-", "eIoni", mod, "Target", 0.0, 10 * TeV, new G4UniversalFluctuation());
 
- // *** ion
+    // ---> MicroElec processes activated
 
-  // ---> STANDARD EM processes inactivated below standEnergyLimit
+    mod = new G4MicroElecElasticModel();
+    em_config->SetExtraEmModel("e-", "e-_G4MicroElecElastic", mod, "Target", 0.0, 100 * MeV);
 
-  // STANDARD msc is still active
-  // Inactivate following STANDARD processes 
+    mod = new G4MicroElecInelasticModel();
+    em_config->SetExtraEmModel("e-", "e-_G4MicroElecInelastic", mod, "Target", 16.7 * eV, 100 * MeV);
 
-  mod = new G4BraggIonModel();
-  mod->SetActivationHighEnergyLimit(50*keV);
-  em_config->SetExtraEmModel("GenericIon","ionIoni",mod,"Target",0.0,2*MeV, new G4IonFluctuations());
- 
-  mod = new G4BetheBlochModel();
-  mod->SetActivationLowEnergyLimit(10*GeV);
-  em_config->SetExtraEmModel("GenericIon","ionIoni",mod,"Target",2*MeV,10*TeV, new G4IonFluctuations());
-   
-  // ---> MicroElec processes activated
-  mod = new G4MicroElecInelasticModel(); 
-  mod->SetActivationLowEnergyLimit(50*keV);
-  em_config->SetExtraEmModel("GenericIon","ion_G4MicroElecInelastic",mod,
-			     "Target",0.0,10*GeV);
-  em_config->SetExtraEmModel("GenericIon","ion_G4MicroElecInelastic",new G4DummyModel,
-			     "Target",10*GeV,10*TeV);
+    // *** proton
 
-  // Deexcitation
-  //
-  G4VAtomDeexcitation* de = new G4UAtomicDeexcitation();
-  G4LossTableManager::Instance()->SetAtomDeexcitation(de);
-  de->SetFluo(true);
-  de->SetAuger(true);   
-  de->SetPIXE(true);  
-  de->InitialiseForNewRun();
+    // ---> STANDARD EM processes inactivated below standEnergyLimit
+
+    // STANDARD msc is still active
+    // Inactivate following STANDARD processes
+
+    mod = new G4BraggModel();
+    mod->SetActivationHighEnergyLimit(50 * keV);
+    em_config->SetExtraEmModel("proton", "hIoni", mod, "Target", 0.0, 2 * MeV, new G4IonFluctuations());
+
+    mod = new G4BetheBlochModel();
+    mod->SetActivationLowEnergyLimit(10 * GeV);
+    em_config->SetExtraEmModel("proton", "hIoni", mod, "Target", 2 * MeV, 10 * TeV, new G4IonFluctuations());
+
+    // ---> MicroElec processes activated
+    mod = new G4MicroElecInelasticModel();
+    mod->SetActivationLowEnergyLimit(50 * keV);
+    em_config->SetExtraEmModel("proton", "p_G4MicroElecInelastic", mod, "Target", 0.0, 10 * GeV);
+    em_config->SetExtraEmModel("proton", "p_G4MicroElecInelastic", new G4DummyModel,
+                               "Target", 10 * GeV, 10 * TeV);
+
+    // *** ion
+
+    // ---> STANDARD EM processes inactivated below standEnergyLimit
+
+    // STANDARD msc is still active
+    // Inactivate following STANDARD processes
+
+    mod = new G4BraggIonModel();
+    mod->SetActivationHighEnergyLimit(50 * keV);
+    em_config->SetExtraEmModel("GenericIon", "ionIoni", mod, "Target", 0.0, 2 * MeV, new G4IonFluctuations());
+
+    mod = new G4BetheBlochModel();
+    mod->SetActivationLowEnergyLimit(10 * GeV);
+    em_config->SetExtraEmModel("GenericIon", "ionIoni", mod, "Target", 2 * MeV, 10 * TeV, new G4IonFluctuations());
+
+    // ---> MicroElec processes activated
+    mod = new G4MicroElecInelasticModel();
+    mod->SetActivationLowEnergyLimit(50 * keV);
+    em_config->SetExtraEmModel("GenericIon", "ion_G4MicroElecInelastic", mod,
+                               "Target", 0.0, 10 * GeV);
+    em_config->SetExtraEmModel("GenericIon", "ion_G4MicroElecInelastic", new G4DummyModel,
+                               "Target", 10 * GeV, 10 * TeV);
+
+    // Deexcitation
+    //
+    G4VAtomDeexcitation *de = new G4UAtomicDeexcitation();
+    G4LossTableManager::Instance()->SetAtomDeexcitation(de);
+    de->SetFluo(true);
+    de->SetAuger(true);
+    de->SetPIXE(true);
+    de->InitialiseForNewRun();
 
 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-void PhysicsList::ConstructGeneral()
-{ }
+void PhysicsList::ConstructGeneral() {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-void PhysicsList::SetCuts()
-{
-  if (verboseLevel >0)
-  {
-    G4cout << "PhysicsList::SetCuts:";
-    G4cout << "CutLength : " << G4BestUnit(defaultCutValue,"Length") << G4endl;
-  }  
-  
-  // set cut values for gamma at first and for e- second and next for e+,
-  // because some processes for e+/e- need cut values for gamma 
-  SetCutValue(cutForGamma, "gamma");
-  SetCutValue(cutForElectron, "e-");
-  SetCutValue(cutForPositron, "e+");
-  SetCutValue(cutForProton, "proton");
-  
-  if (verboseLevel>0) { DumpCutValuesTable(); }
+void PhysicsList::SetCuts() {
+    if (verboseLevel > 0) {
+        G4cout << "PhysicsList::SetCuts:";
+        G4cout << "CutLength : " << G4BestUnit(defaultCutValue, "Length") << G4endl;
+    }
+
+    // set cut values for gamma at first and for e- second and next for e+,
+    // because some processes for e+/e- need cut values for gamma
+    SetCutValue(cutForGamma, "gamma");
+    SetCutValue(cutForElectron, "e-");
+    SetCutValue(cutForPositron, "e+");
+    SetCutValue(cutForProton, "proton");
+
+    if (verboseLevel > 0) { DumpCutValuesTable(); }
 }
